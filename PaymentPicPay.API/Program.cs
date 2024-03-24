@@ -1,40 +1,17 @@
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using PaymentPicPay.API.Data.Caching;
-using PaymentPicPay.API.Data.Context;
-using PaymentPicPay.API.Domain.Models;
-using PaymentPicPay.API.Domain.Validators;
 using PaymentPicPay.API.Extensions;
 using PaymentPicPay.API.Extensions.Endpoints;
-using PaymentPicPay.API.Services.Externals.EmailSendService;
-using PaymentPicPay.API.Services.Externals.TransferAuthorizer;
+using PaymentPicPay.API.Extensions.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add HttpClientFactory
 builder.Services.AddHttpClient();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<PaymentDataContext>(
-    options => options.UseInMemoryDatabase("PaymentPicPay"));
+builder.RegisterServices();
 
-builder.Services.AddScoped<DbInitializer>();
-
-//Validators
-builder.Services.AddScoped<IValidator<Transaction>, TransactionValidator>();
-
-//Caching redis
-builder.Services.AddScoped<IRedisRepository, RedisRepository>();
-
-//External Services
-builder.Services.AddTransient<IEmailSendService, EmailSendService>();
-builder.Services.AddTransient<ITransferAuthorizerService, TransferAuthorizerService>();
-
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = "localhost:6379";
-});
+builder.AddValidators();
 
 var app = builder.Build();
 
