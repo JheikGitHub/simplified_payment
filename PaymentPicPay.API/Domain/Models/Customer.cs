@@ -1,6 +1,6 @@
-﻿using PaymentPicPay.API.ValueObjects;
+﻿using PaymentPicPay.API.Domain.ValueObjects;
 
-namespace PaymentPicPay.API.Models
+namespace PaymentPicPay.API.Domain.Models
 {
     public class Customer : User
     {

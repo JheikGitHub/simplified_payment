@@ -1,4 +1,4 @@
-﻿using PaymentPicPay.API.Models;
+﻿using PaymentPicPay.API.Domain.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

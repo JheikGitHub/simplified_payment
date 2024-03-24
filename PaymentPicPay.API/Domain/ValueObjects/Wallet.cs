@@ -1,4 +1,4 @@
-﻿namespace PaymentPicPay.API.ValueObjects
+﻿namespace PaymentPicPay.API.Domain.ValueObjects
 {
     public class Wallet
     {

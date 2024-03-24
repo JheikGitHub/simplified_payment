@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using PaymentPicPay.API.Models;
+using PaymentPicPay.API.Domain.Models;
 
-namespace PaymentPicPay.API.Validators
+namespace PaymentPicPay.API.Domain.Validators
 {
     public class TransactionValidator : AbstractValidator<Transaction>
     {

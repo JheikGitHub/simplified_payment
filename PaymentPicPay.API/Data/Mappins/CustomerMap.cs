@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using PaymentPicPay.API.Models;
+using PaymentPicPay.API.Domain.Models;
 
-namespace PaymentPicPay.API.Mappins
+namespace PaymentPicPay.API.Data.Mappins
 {
     public class CustomerMap : IEntityTypeConfiguration<Customer>
     {

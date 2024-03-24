@@ -1,6 +1,6 @@
-﻿using PaymentPicPay.API.Enums;
+﻿using PaymentPicPay.API.Domain.Enums;
 
-namespace PaymentPicPay.API.ViewModels
+namespace PaymentPicPay.API.Services.ViewModels
 {
     public class TransactionViewModel
     {

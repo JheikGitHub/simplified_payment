@@ -1,6 +1,6 @@
-﻿using PaymentPicPay.API.Enums;
+﻿using PaymentPicPay.API.Domain.Enums;
 
-namespace PaymentPicPay.API.Models
+namespace PaymentPicPay.API.Domain.Models
 {
     public class Transaction : EntityBase
     {

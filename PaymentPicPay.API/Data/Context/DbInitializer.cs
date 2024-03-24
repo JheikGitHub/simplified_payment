@@ -1,7 +1,7 @@
-﻿using PaymentPicPay.API.Models;
-using PaymentPicPay.API.ValueObjects;
+﻿using PaymentPicPay.API.Domain.Models;
+using PaymentPicPay.API.Domain.ValueObjects;
 
-namespace PaymentPicPay.API.Context
+namespace PaymentPicPay.API.Data.Context
 {
     public class DbInitializer : IDisposable
     {

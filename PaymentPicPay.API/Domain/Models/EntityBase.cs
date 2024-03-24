@@ -1,4 +1,4 @@
-﻿namespace PaymentPicPay.API.Models
+﻿namespace PaymentPicPay.API.Domain.Models
 {
     public class EntityBase : IEquatable<int>
     {
@@ -15,7 +15,7 @@
         {
             return Id == other;
         }
-         
+
         public void UpdateDate()
         {
             UpdatedDate = DateTime.UtcNow;

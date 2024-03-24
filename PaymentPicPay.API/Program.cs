@@ -1,12 +1,13 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using PaymentPicPay.API.Context;
-using PaymentPicPay.API.Models;
-using PaymentPicPay.API.Repositories;
+using PaymentPicPay.API.Data.Caching;
+using PaymentPicPay.API.Data.Context;
+using PaymentPicPay.API.Domain.Enums;
+using PaymentPicPay.API.Domain.Models;
+using PaymentPicPay.API.Domain.Validators;
 using PaymentPicPay.API.Services.Externals.EmailSendService;
 using PaymentPicPay.API.Services.Externals.TransferAuthorizer;
-using PaymentPicPay.API.Validators;
-using PaymentPicPay.API.ViewModels;
+using PaymentPicPay.API.Services.ViewModels;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -136,10 +137,10 @@ app.MapPost("v1/api/transaction",
             User userReceived = null;
             switch (viewModel.TransactionType)
             {
-                case PaymentPicPay.API.Enums.ETransactionType.B2B:
+                case ETransactionType.B2B:
                     userReceived = context.Customers.FirstOrDefault(received => received.Id == viewModel.ReceiveId);
                     break;
-                case PaymentPicPay.API.Enums.ETransactionType.B2C:
+                case ETransactionType.B2C:
                     userReceived = context.Merchants.FirstOrDefault(received => received.Id == viewModel.ReceiveId);
                     break;
 

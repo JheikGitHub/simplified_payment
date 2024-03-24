@@ -1,5 +1,4 @@
-﻿
-namespace PaymentPicPay.API.Repositories
+﻿namespace PaymentPicPay.API.Data.Caching
 {
     public interface IRedisRepository
     {

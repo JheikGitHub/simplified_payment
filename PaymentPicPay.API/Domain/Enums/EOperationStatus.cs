@@ -1,4 +1,4 @@
-﻿namespace PaymentPicPay.API.Enums
+﻿namespace PaymentPicPay.API.Domain.Enums
 {
     public enum EOperationStatus
     {

@@ -1,4 +1,4 @@
-﻿using PaymentPicPay.API.Models;
+﻿using PaymentPicPay.API.Domain.Models;
 
 namespace PaymentPicPay.API.Services.Externals.EmailSendService
 {

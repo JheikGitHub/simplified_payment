@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PaymentPicPay.API.Mappins;
-using PaymentPicPay.API.Models;
+using PaymentPicPay.API.Data.Mappins;
+using PaymentPicPay.API.Domain.Models;
 
-namespace PaymentPicPay.API.Context
+namespace PaymentPicPay.API.Data.Context
 {
     public class PaymentDataContext : DbContext
     {

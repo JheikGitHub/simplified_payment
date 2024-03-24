@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 
-namespace PaymentPicPay.API.Repositories
+namespace PaymentPicPay.API.Data.Caching
 {
     public class RedisRepository : IRedisRepository
     {

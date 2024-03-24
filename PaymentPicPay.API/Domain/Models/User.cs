@@ -1,10 +1,10 @@
-﻿using PaymentPicPay.API.ValueObjects;
+﻿using PaymentPicPay.API.Domain.ValueObjects;
 
-namespace PaymentPicPay.API.Models
+namespace PaymentPicPay.API.Domain.Models
 {
     public class User : EntityBase
     {
-        protected User() { } 
+        protected User() { }
         public User(string fullName, Email email, string password, Wallet wallet)
         {
             FullName = fullName;
