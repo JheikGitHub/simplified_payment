@@ -1,5 +1,5 @@
 ﻿using PaymentPicPay.API.Data.Caching;
-using PaymentPicPay.API.Data.Context;
+using PaymentPicPay.API.Data.Repositories._RepositoryWrapper;
 using PaymentPicPay.API.Domain.Models;
 using System.Text;
 using System.Text.Json;
@@ -14,7 +14,7 @@ namespace PaymentPicPay.API.Extensions.Endpoints
             app.MapGet(
                 "/v1/api/customers",
                 async (
-                    PaymentDataContext context,
+                    IRepositoryWrapper repository,
                     IRedisRepository redis) =>
                 {
                     try
@@ -29,7 +29,7 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                             customers = JsonSerializer.Deserialize<IEnumerable<Customer>>(Encoding.UTF8.GetString(cacheValue));
                         else
                         {
-                            customers = [.. context.Customers];
+                            customers = await repository.CustomerRepository.GetAllAsync();
                             await redis.SetAsync(cacheKey, JsonSerializer.Serialize(customers));
                         }
 
@@ -43,7 +43,12 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                             title: "Error in get all customers");
                     }
                 }).WithName("GetAllCustomers")
-                .WithOpenApi(options => { options.Description = "Get all customers."; options.Summary = "This is a summary"; return options; })
+                .WithOpenApi(options => 
+                { 
+                    options.Description = "Get all customers."; 
+                    options.Summary = "Get all customers."; 
+                    return options; 
+                })
                 .Produces<IEnumerable<Customer>>(statusCode: 200)
                 .Produces(statusCode: 500);
 

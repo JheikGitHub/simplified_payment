@@ -16,7 +16,9 @@ namespace PaymentPicPay.API.Domain.Models
         }
 
         public int SendId { get; private set; }
+        public User SendUser { get; private set; }
         public int ReceiveId { get; private set; }
+        public User ReceiverUser { get; private set; }
         public decimal Amount { get; private set; }
         public EOperationStatus OperationStatus { get; private set; }
         public ETransactionType TransactionType { get; private set; }

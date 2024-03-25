@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using PaymentPicPay.API.Data.Context;
+using PaymentPicPay.API.Data.Repositories._RepositoryWrapper;
 using PaymentPicPay.API.Domain.Enums;
 using PaymentPicPay.API.Domain.Models;
 using PaymentPicPay.API.Services.Externals.EmailSendService;
@@ -13,14 +13,36 @@ namespace PaymentPicPay.API.Extensions.Endpoints
         public static WebApplication UseTransactionEnpoints(this WebApplication app)
         {
 
-            #region Transaction
+            #region GET Transaction
+            app.MapGet(
+                "v1/api/transactions",
+                async
+                (IRepositoryWrapper repository) =>
+                {
+                    try
+                    {
+                        var transactions = await repository.TransactionRepository.GetAllIncludes();
+
+                        return Results.Ok(transactions);
+                    }
+                    catch (Exception e)
+                    {
+                        return Results.Problem(
+                            e.Message,
+                            statusCode: StatusCodes.Status500InternalServerError,
+                            title: "Error in get all transactions");
+                    }
+                });
+            #endregion
+
+            #region POST Transaction
             app.MapPost("v1/api/transaction",
                 async
                 (TransactionViewModel viewModel,
                 IValidator<Transaction> Validator,
                 ITransferAuthorizerService authorizationService,
                 IEmailSendService emailSendService,
-                PaymentDataContext context) =>
+                IRepositoryWrapper repository) =>
                 {
                     try
                     {
@@ -29,16 +51,16 @@ namespace PaymentPicPay.API.Extensions.Endpoints
 
                         #region Buscar usuarios
 
-                        User userSend = context.Customers.FirstOrDefault(send => send.Id == viewModel.SendId);
+                        User userSend = await repository.CustomerRepository.GetAsync(viewModel.SendId, false);
 
                         User userReceived = null;
                         switch (viewModel.TransactionType)
                         {
                             case ETransactionType.B2B:
-                                userReceived = context.Customers.FirstOrDefault(received => received.Id == viewModel.ReceiveId);
+                                userReceived = await repository.CustomerRepository.GetAsync(viewModel.ReceiveId, false);
                                 break;
                             case ETransactionType.B2C:
-                                userReceived = context.Merchants.FirstOrDefault(received => received.Id == viewModel.ReceiveId);
+                                userReceived = await repository.MerchantRepository.GetAsync(viewModel.ReceiveId, false);
                                 break;
 
                         }
@@ -82,7 +104,12 @@ namespace PaymentPicPay.API.Extensions.Endpoints
 
                         #endregion
 
-                        await context.SaveChangesAsync();
+                        #region Salva a transação
+
+                        await repository.TransactionRepository.AddAsync(transaction);
+
+                        await repository.SaveChangesAsync();
+                        #endregion
 
                         return Results.Ok();
                     }
