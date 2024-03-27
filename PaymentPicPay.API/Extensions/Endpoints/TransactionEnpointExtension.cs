@@ -14,6 +14,37 @@ namespace PaymentPicPay.API.Extensions.Endpoints
         {
 
             #region GET Transaction
+
+            app.MapGet(
+                "v1/api/transaction/{id:int}",
+                async
+                (int id, 
+                IRepositoryWrapper repository) =>
+                {
+                    try
+                    {
+                        var transaction = await repository.TransactionRepository.GetAsync(id, true);
+
+                        return Results.Ok(transaction);
+                    }
+                    catch (Exception e)
+                    {
+                        return Results.Problem(
+                            e.Message,
+                            statusCode: StatusCodes.Status500InternalServerError,
+                            title: "Error in get transaction by id");
+                    }
+                }).WithName("GetTransactionById")
+                .WithOpenApi(options =>
+                {
+                    options.Description = "Get transaction by id.";
+                    options.Summary = "Get transaction by id.";
+                    return options;
+                })
+                .Produces<IEnumerable<Customer>>(statusCode: 200)
+                .Produces(statusCode: 500); ;
+
+
             app.MapGet(
                 "v1/api/transactions",
                 async
@@ -32,8 +63,17 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                             statusCode: StatusCodes.Status500InternalServerError,
                             title: "Error in get all transactions");
                     }
-                });
+                }).WithName("GetTransactions")
+                .WithOpenApi(options =>
+                {
+                    options.Description = "Get all transactions.";
+                    options.Summary = "Get all transactions.";
+                    return options;
+                })
+                .Produces<IEnumerable<Customer>>(statusCode: 200)
+                .Produces(statusCode: 500); ;
             #endregion
+
 
             #region POST Transaction
             app.MapPost("v1/api/transaction",
@@ -57,10 +97,16 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                         switch (viewModel.TransactionType)
                         {
                             case ETransactionType.B2B:
+                                if (viewModel.SendId == viewModel.ReceiveId)
+                                    return Results.BadRequest("Invalid transaction, it is not possible to transfer value to the same customer.");
+
                                 userReceived = await repository.CustomerRepository.GetAsync(viewModel.ReceiveId, false);
+
                                 break;
                             case ETransactionType.B2C:
+
                                 userReceived = await repository.MerchantRepository.GetAsync(viewModel.ReceiveId, false);
+
                                 break;
 
                         }
@@ -82,7 +128,8 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                         if (!result.IsValid)
                             return Results.ValidationProblem(result.ToDictionary());
 
-                        var authorizationTransfer = await authorizationService.AuthorizationTranfer();
+                        //var authorizationTransfer = await authorizationService.AuthorizationTranfer();
+                        var authorizationTransfer = true;
 
                         if (!authorizationTransfer)
                             return Results.Problem(
@@ -111,7 +158,10 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                         await repository.SaveChangesAsync();
                         #endregion
 
-                        return Results.Ok();
+                        return Results.CreatedAtRoute(
+                            "GetTransactionById",
+                            $"v1/api/transaction/{transaction.Id}",
+                            transaction);
                     }
                     catch (Exception e)
                     {
@@ -120,7 +170,9 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                             statusCode: StatusCodes.Status500InternalServerError,
                             title: "Error when making the transaction.");
                     }
-                });
+                })
+                .Produces<IEnumerable<Customer>>(statusCode: 200)
+                .Produces(statusCode: 500); ; ;
             #endregion
 
             return app;

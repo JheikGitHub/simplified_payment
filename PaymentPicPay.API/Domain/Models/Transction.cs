@@ -16,9 +16,7 @@ namespace PaymentPicPay.API.Domain.Models
         }
 
         public int SendId { get; private set; }
-        public User SendUser { get; private set; }
         public int ReceiveId { get; private set; }
-        public User ReceiverUser { get; private set; }
         public decimal Amount { get; private set; }
         public EOperationStatus OperationStatus { get; private set; }
         public ETransactionType TransactionType { get; private set; }
@@ -28,6 +26,8 @@ namespace PaymentPicPay.API.Domain.Models
             try
             {
                 if (send is not Customer)
+                    OperationStatus = EOperationStatus.Error;
+                else if(send.Id == receive.Id && receive is Customer)
                     OperationStatus = EOperationStatus.Error;
                 else
                 {

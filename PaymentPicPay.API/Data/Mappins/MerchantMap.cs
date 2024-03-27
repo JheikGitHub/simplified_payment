@@ -17,7 +17,6 @@ namespace PaymentPicPay.API.Data.Mappins
                 .HasColumnType("varchar(200)")
                 .IsRequired();
 
-
             builder.Property(x => x.CNPJ)
                 .HasColumnName("Cpf")
                 .HasColumnType("varchar(14)")

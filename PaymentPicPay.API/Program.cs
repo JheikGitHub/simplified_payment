@@ -1,8 +1,6 @@
-using Microsoft.OpenApi.Models;
 using PaymentPicPay.API.Extensions;
 using PaymentPicPay.API.Extensions.Endpoints;
 using PaymentPicPay.API.Extensions.IoC;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
