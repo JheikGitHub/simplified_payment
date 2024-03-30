@@ -1,4 +1,4 @@
-﻿namespace PaymentPicPay.API.Services.ViewModels
+﻿namespace PaymentPicPay.API.Services.ViewModels.Users
 {
     public class UserViewModel
     {

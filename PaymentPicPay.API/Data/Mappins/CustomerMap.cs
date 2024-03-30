@@ -45,6 +45,7 @@ namespace PaymentPicPay.API.Data.Mappins
             builder.HasIndex(x => x.CPF).IsUnique();
             builder.OwnsOne(x => x.Email).HasIndex(index => index.Address).IsUnique();
 
+            builder.HasMany(x => x.Transactions);
         }
     }
 }

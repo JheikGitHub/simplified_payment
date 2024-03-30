@@ -17,8 +17,13 @@ namespace PaymentPicPay.API.Domain.Models
             CNPJ = cNPJ;
         }
 
-
         public string CNPJ { get; private set; }
 
+        public ICollection<TransactionB2C> Transactions { get; set; } = [];
+
+        public override bool IsValid()
+        {
+            return Validations.IsValid;
+        }
     }
 }

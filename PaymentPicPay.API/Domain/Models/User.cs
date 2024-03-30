@@ -15,8 +15,8 @@ namespace PaymentPicPay.API.Domain.Models
 
         public string FullName { get; private set; }
         public Email Email { get; private set; }
-        public string Password { get; set; }
-        public Wallet Wallet { get; set; }
+        public string Password { get; private set; }
+        public Wallet Wallet { get; private set; }
 
     }
 }

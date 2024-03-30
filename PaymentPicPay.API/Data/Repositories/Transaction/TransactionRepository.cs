@@ -2,7 +2,7 @@
 using PaymentPicPay.API.Data.Context;
 using PaymentPicPay.API.Data.Repositories.Shared;
 using PaymentPicPay.API.Domain.Enums;
-using PaymentPicPay.API.Services.ViewModels;
+using PaymentPicPay.API.Services.ViewModels.Transactions;
 using TransactionEntity = PaymentPicPay.API.Domain.Models.Transaction;
 
 namespace PaymentPicPay.API.Data.Repositories.Transaction
@@ -29,8 +29,8 @@ namespace PaymentPicPay.API.Data.Repositories.Transaction
                         select new TransactionViewModel
                         {
                             Amount = transaction.Amount,
-                            SendId = transaction.SendId,
                             TransactionType = transaction.TransactionType,
+                            OperationStatus = transaction.OperationStatus,
                             Send = new CustomerViewModel
                             {
                                 CPF = customer.CPF,

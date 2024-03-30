@@ -1,6 +1,6 @@
 ﻿using PaymentPicPay.API.Domain.Models;
 
-namespace PaymentPicPay.API.Services.ViewModels
+namespace PaymentPicPay.API.Services.ViewModels.Users
 {
     public class MerchantViewModel : UserViewModel
     {

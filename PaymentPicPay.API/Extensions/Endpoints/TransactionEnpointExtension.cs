@@ -4,7 +4,7 @@ using PaymentPicPay.API.Domain.Enums;
 using PaymentPicPay.API.Domain.Models;
 using PaymentPicPay.API.Services.Externals.EmailSendService;
 using PaymentPicPay.API.Services.Externals.TransferAuthorizer;
-using PaymentPicPay.API.Services.ViewModels;
+using PaymentPicPay.API.Services.ViewModels.Transactions;
 
 namespace PaymentPicPay.API.Extensions.Endpoints
 {
@@ -13,12 +13,12 @@ namespace PaymentPicPay.API.Extensions.Endpoints
         public static WebApplication UseTransactionEnpoints(this WebApplication app)
         {
 
-            #region GET Transaction
+            #region GetById Transaction
 
             app.MapGet(
                 "v1/api/transaction/{id:int}",
                 async
-                (int id, 
+                (int id,
                 IRepositoryWrapper repository) =>
                 {
                     try
@@ -34,6 +34,7 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                             statusCode: StatusCodes.Status500InternalServerError,
                             title: "Error in get transaction by id");
                     }
+
                 }).WithName("GetTransactionById")
                 .WithOpenApi(options =>
                 {
@@ -41,10 +42,12 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                     options.Summary = "Get transaction by id.";
                     return options;
                 })
-                .Produces<IEnumerable<Customer>>(statusCode: 200)
+                .Produces<IEnumerable<TransactionViewModel>>(statusCode: 200)
                 .Produces(statusCode: 500); ;
 
+            #endregion
 
+            #region GetAll Transaction
             app.MapGet(
                 "v1/api/transactions",
                 async
@@ -70,64 +73,59 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                     options.Summary = "Get all transactions.";
                     return options;
                 })
-                .Produces<IEnumerable<Customer>>(statusCode: 200)
+                .Produces<IEnumerable<TransactionViewModel>>(statusCode: 200)
                 .Produces(statusCode: 500); ;
             #endregion
 
-
             #region POST Transaction
-            app.MapPost("v1/api/transaction",
+            _ = app.MapPost("v1/api/transaction",
                 async
-                (TransactionViewModel viewModel,
-                IValidator<Transaction> Validator,
+                (CreateTransactionViewModel transactionViewModel,
                 ITransferAuthorizerService authorizationService,
                 IEmailSendService emailSendService,
                 IRepositoryWrapper repository) =>
                 {
                     try
                     {
-                        if (viewModel == null)
+                        if (transactionViewModel == null)
                             return Results.BadRequest("The transaction data is invalid.");
 
-                        #region Buscar usuarios
+                        #region Buscar usuarios e cria transação
 
-                        User userSend = await repository.CustomerRepository.GetAsync(viewModel.SendId, false);
+                        Customer userSend = await repository.CustomerRepository.GetAsync(transactionViewModel.SendId, false);
 
-                        User userReceived = null;
-                        switch (viewModel.TransactionType)
+                        Merchant merchantReceived = null;
+                        Customer customerReceived = null;
+                        Transaction transaction = null;
+
+                        if (transactionViewModel.TransactionType == ETransactionType.B2B)
                         {
-                            case ETransactionType.B2B:
-                                if (viewModel.SendId == viewModel.ReceiveId)
-                                    return Results.BadRequest("Invalid transaction, it is not possible to transfer value to the same customer.");
+                            if (transactionViewModel.SendId == transactionViewModel.ReceiveId)
+                                return Results.BadRequest("Invalid transaction, it is not possible to transfer value to the same customer.");
 
-                                userReceived = await repository.CustomerRepository.GetAsync(viewModel.ReceiveId, false);
+                            customerReceived = await repository.CustomerRepository.GetAsync(transactionViewModel.ReceiveId, false);
 
-                                break;
-                            case ETransactionType.B2C:
+                            transaction = new TransactionB2B(userSend, customerReceived, transactionViewModel.Amount);
 
-                                userReceived = await repository.MerchantRepository.GetAsync(viewModel.ReceiveId, false);
+                        }
+                        else if (transactionViewModel.TransactionType == ETransactionType.B2C)
+                        {
+                            merchantReceived = await repository.MerchantRepository.GetAsync(transactionViewModel.ReceiveId, false);
 
-                                break;
-
+                            transaction = new TransactionB2C(userSend, merchantReceived, transactionViewModel.Amount);
                         }
 
                         #endregion
 
-                        #region Criar transação
-                        Transaction transaction = new(
-                            userSend.Id,
-                            userReceived.Id,
-                            viewModel.Amount,
-                            viewModel.TransactionType);
+                        #region Valida os dados da transação
+                        transaction.IsValid();
+
+                        if (!transaction.IsValid())
+                            return Results.ValidationProblem(transaction.Validations.ToDictionary());
 
                         #endregion
 
-                        #region Validar os dados da transação
-                        var result = Validator.Validate(transaction);
-
-                        if (!result.IsValid)
-                            return Results.ValidationProblem(result.ToDictionary());
-
+                        #region Autenticador externo
                         //var authorizationTransfer = await authorizationService.AuthorizationTranfer();
                         var authorizationTransfer = true;
 
@@ -141,25 +139,27 @@ namespace PaymentPicPay.API.Extensions.Endpoints
 
                         #region Realizar a transação
 
-                        var resultTransaction = transaction.Transfer(userSend, userReceived);
+                        transaction.Transfer();
 
+                        if (!transaction.IsValid())
+                            return Results.ValidationProblem(transaction.Validations.ToDictionary());
                         #endregion
 
                         #region Notificação de recebimento
-                        if (resultTransaction)
-                            await emailSendService.SendNotificationTransaction(userReceived);
+                            if (transactionViewModel.TransactionType == ETransactionType.B2B)
+                                await emailSendService.SendNotificationTransaction(customerReceived);
+                            else if (transactionViewModel.TransactionType == ETransactionType.B2C)
+                                await emailSendService.SendNotificationTransaction(merchantReceived);
 
                         #endregion
 
                         #region Salva a transação
-
                         await repository.TransactionRepository.AddAsync(transaction);
 
                         await repository.SaveChangesAsync();
                         #endregion
 
-                        return Results.CreatedAtRoute(
-                            "GetTransactionById",
+                        return Results.Created(
                             $"v1/api/transaction/{transaction.Id}",
                             transaction);
                     }
@@ -171,7 +171,7 @@ namespace PaymentPicPay.API.Extensions.Endpoints
                             title: "Error when making the transaction.");
                     }
                 })
-                .Produces<IEnumerable<Customer>>(statusCode: 200)
+                .Produces<IEnumerable<CreateTransactionViewModel>>(statusCode: 200)
                 .Produces(statusCode: 500); ; ;
             #endregion
 

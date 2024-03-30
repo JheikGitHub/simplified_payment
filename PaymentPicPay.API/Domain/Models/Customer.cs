@@ -18,5 +18,11 @@ namespace PaymentPicPay.API.Domain.Models
         }
 
         public string CPF { get; private set; }
+        public ICollection<TransactionB2B> Transactions { get; set; } = [];
+
+        public override bool IsValid()
+        {
+            return Validations.IsValid;
+        }
     }
 }

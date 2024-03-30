@@ -1,17 +1,9 @@
-﻿using FluentValidation;
-using Microsoft.OpenApi.Models;
-using PaymentPicPay.API.Domain.Models;
-using PaymentPicPay.API.Domain.Validators;
+﻿using Microsoft.OpenApi.Models;
 
 namespace PaymentPicPay.API.Extensions
 {
     public static class BuilderExtension
     {
-        public static void AddValidators(this WebApplicationBuilder builder)
-        {
-            builder.Services.AddScoped<IValidator<Transaction>, TransactionValidator>();
-        }
-
         public static void AddSwagger(this WebApplicationBuilder builder)
         {
             builder.Services.AddSwaggerGen(options =>

@@ -10,9 +10,9 @@ namespace PaymentPicPay.Tests.Domain._Builder
 
         }
 
-        private readonly string FullName = "Customer Test";
-        private readonly Email Email = new("Customer@mail.com");
-        private readonly string Password = "@Customer123";
+        private readonly string FullName = "Merchant Test";
+        private readonly Email Email = new("Merchant@mail.com");
+        private readonly string Password = "@Merchant123";
         private readonly Wallet Wallet = new(1000);
         private readonly string CNPJ = "12345678910";
 

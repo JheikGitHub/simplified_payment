@@ -11,14 +11,15 @@ namespace PaymentPicPay.API.Data.Context
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Merchant> Merchants { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Transaction> Transactions{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.ApplyConfiguration(new TransactionMap());
             modelBuilder.ApplyConfiguration(new MerchantMap());
             modelBuilder.ApplyConfiguration(new CustomerMap());
+            modelBuilder.ApplyConfiguration(new TransactionB2CMap());
+            modelBuilder.ApplyConfiguration(new TransactionB2BMap());
 
             base.OnModelCreating(modelBuilder);
         }

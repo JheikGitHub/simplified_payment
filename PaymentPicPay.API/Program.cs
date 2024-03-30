@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Http.Json;
 using PaymentPicPay.API.Extensions;
 using PaymentPicPay.API.Extensions.Endpoints;
 using PaymentPicPay.API.Extensions.IoC;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +14,10 @@ builder.AddSwagger();
 
 builder.RegisterServices();
 
-builder.AddValidators();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 var app = builder.Build();
 
